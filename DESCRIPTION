@@ -1,0 +1,13 @@
+Package: GPA
+Version: 0.9-0
+Date: 2014-01-15
+Title: GPA (A statistical approach to prioritizing GWAS results by
+        integrating pleiotropy information and annotation data)
+Author: Dongjun Chung
+Maintainer: Dongjun Chung <dongjun.chung@yale.edu>
+Depends: R (>= 3.0.0), methods, graphics, Rcpp
+LinkingTo: Rcpp
+Description: This package provides functions for fitting GPA, a statistical framework to prioritize GWAS results by integrating pleiotropy information and annotation data.
+License: GPL (>= 2)
+URL: http://bioinformatics.med.yale.edu/group/
+Packaged: 2014-01-14 19:34:08 UTC; dc654

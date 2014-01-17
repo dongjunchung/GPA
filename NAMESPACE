@@ -1,0 +1,7 @@
+useDynLib(GPA)
+
+import( methods, graphics, Rcpp )
+
+export( GPA, aTest, pTest )
+
+export( show, print, cov, estimates )
