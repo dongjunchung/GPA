@@ -2,8 +2,10 @@
 \alias{GPA-class}
 \alias{show,GPA-method}
 \alias{print,GPA-method}
+\alias{fdr,GPA-method}
 \alias{cov,GPA-method}
 \alias{estimates,GPA-method}
+\alias{fdr}
 \alias{cov}
 \alias{estimates}
 \Rdversion{1.1}
@@ -31,7 +33,10 @@ Objects can be created by calls of the form \code{new("GPA", ...)}.
   \describe{
     \item{show}{\code{signature(object = "GPA")}: provide brief summary of the object. }
     \item{print}{\code{signature(x = "GPA")}: 
-		provide matrix of the posterior probability that it is not a risk-associated SNP. }
+		provide the matrix of posterior probability that a SNP belongs to each combination of association status. }
+    \item{fdr}{\code{signature(object = "GPA")}: 
+		provide the matrix of local FDR that a SNP is not associated with each phenotype,
+		where the order of column is same as those in input GWAS data. }
     \item{cov}{\code{signature(object = "GPA", silent=FALSE, vDigitEst=1000, vDigitSE=1000 )}: 
         provide the covariance matrix for parameter estimates of GPA model.
 		If \code{silent=TRUE}, it suppresses the summary output.
@@ -56,6 +61,7 @@ showClass("GPA")
 fit.GPA.wAnn <- GPA( pmat, ann )
 fit.GPA.wAnn
 pp.GPA.wAnn <- print( fit.GPA.wAnn )
+fdr.GPA.wAnn <- fdr( fit.GPA.wAnn )
 cov.GPA.wAnn <- cov( fit.GPA.wAnn )
 est.GPA.wAnn <- estimates( fit.GPA.wAnn )
 }

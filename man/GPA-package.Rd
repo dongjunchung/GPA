@@ -2,8 +2,7 @@
 \alias{GPA-package}
 \docType{package}
 \title{
-GPA (A statistical approach to prioritizing GWAS results 
-by integrating pleiotropy information and annotation data)
+GPA (Genetic analysis incorporating Pleiotropy and Annotation)
 }
 \description{
 This package provides functions for fitting GPA,
@@ -14,15 +13,16 @@ by integrating pleiotropy information and annotation data.
 \tabular{ll}{
 Package: \tab GPA\cr
 Type: \tab Package\cr
-Version: \tab 0.9.0\cr
-Date: \tab 2014-01-15\cr
+Version: \tab 0.9.1\cr
+Date: \tab 2014-01-31\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 }
 This package contains a main class, \code{GPA}, which represents GPA model fit.
-This package contains three main methods, 
-\code{GPA}, \code{pTest}, and \code{aTest}.
-\code{GPA} method fits the GPA model.
+This package contains four main methods, 
+\code{GPA}, \code{assoc}, \code{pTest}, and \code{aTest}.
+\code{GPA} method fits the GPA model
+and \code{assoc} method implements association mapping.
 \code{pTest} and \code{aTest} methods implement hypothesis testing
 for pleiotropy and annotation enrichment, respectively.
 }
@@ -38,7 +38,7 @@ by integrating pleiotropy information and annotation data."
 }
 \keyword{ package }
 \seealso{
-\code{\link{GPA}}, \code{\link{pTest}}, \code{\link{aTest}}, 
+\code{\link{GPA}}, \code{\link{assoc}}, \code{\link{pTest}}, \code{\link{aTest}}, 
 \code{\linkS4class{GPA}}.
 }
 \examples{
@@ -90,6 +90,10 @@ cov.GPA.wAnn <- cov( fit.GPA.wAnn )
 # GPA under pleiotropy H0
 
 fit.GPA.pleiotropy.H0 <- GPA( pmat, NULL, pleiotropyH0=TRUE )
+
+# association mapping
+
+assoc.GPA.wAnn <- assoc( fit.GPA.wAnn, FDR=0.05, fdrControl="global" )
 
 # hypothesis testing for pleiotropy
 

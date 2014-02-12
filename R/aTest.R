@@ -1,5 +1,20 @@
 
 aTest <- function( fitWithoutAnn, fitWithAnn, vDigit=1000 ) {
+	# check correctness of arguments
+	
+	if ( !is( fitWithoutAnn, "GPA" ) ) {
+		stop( " Input for 'fitWithoutAnn' argument is not 'GPA' class object. Please check the input." )
+	}
+	
+	if ( !is( fitWithAnn, "GPA" ) ) {
+		stop( " Input for 'fitWithAnn' argument is not 'GPA' class object. Please check the input." )
+	}
+	
+	if ( vDigit %% 10 != 0 | vDigit <= 0 ) {
+		stop( "Inappropriate value for 'vDigit' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+	}
+	
+	# load fits
 	
 	empiricalNull <- fitWithoutAnn@setting$empiricalNull
 	
@@ -99,9 +114,11 @@ aTest <- function( fitWithoutAnn, fitWithAnn, vDigit=1000 ) {
 	message( "Hypothesis testing for annotation enrichment" )
 	message( "( Note: This version of test is designed for single annotation data )" )
 	message( "--------------------------------------------------" )
+	
+	message( "q:" )
 	message( "GWAS combination: ", paste( combVec, collapse=" " ) )
-	message( "q1:" )
 	for ( d in 1:nAnn ) {    	
+		message( "Annotation #",d,":")
     	message( "    ", paste( round(fitWithAnn@fit$q1[d,]*vDigit)/vDigit, collapse=" " ) )
     	
     	if ( empiricalNull ) {
@@ -110,6 +127,32 @@ aTest <- function( fitWithoutAnn, fitWithAnn, vDigit=1000 ) {
 			locQ1 <- (nPis-1+nAlpha+nPis*(d-1)+1):(nPis-1+nAlpha+nPis*d)
 		}
     	message( "  ( ", paste( round(seVec[locQ1]*vDigit)/vDigit, collapse=" " ), " )" )
+	}
+	
+	message( " " )
+	message( "Ratio of q over baseline (",combVec[1],"):" )
+	message( "GWAS combination: ", paste( combVec[-1], collapse=" " ) )
+	q1ratio <- q1ratioSE <- matrix( NA, nrow(fitWithAnn@fit$q1), (ncol(fitWithAnn@fit$q1)-1) )
+	for ( d in 1:nAnn ) {
+		# estimates
+		
+		q1ratio[d,] <- fitWithAnn@fit$q1[d,-1] / fitWithAnn@fit$q1[d,1]
+		
+		# SE
+		
+		for ( j in 2:ncol(q1) ) {
+			qderiv <- rep( 0, nrow(fitWithAnn@fit$q1)*ncol(fitWithAnn@fit$q1) )
+			qderiv[ ncol(fitWithAnn@fit$q1) * (d-1) + 1 ] <- - fitWithAnn@fit$q1[d,j] / fitWithAnn@fit$q1[d,1]^2
+			qderiv[ ncol(fitWithAnn@fit$q1) * (d-1) + j ] <- 1 / fitWithAnn@fit$q1[d,1]
+			
+			gderiv <- as.matrix( c( rep( 0, nrow(cov.GPA.wAnn) - nrow(fitWithAnn@fit$q1)*ncol(fitWithAnn@fit$q1) ), qderiv ) )
+			q1ratioSE[d,(j-1)] <- sqrt( t(gderiv) %*% cov.GPA.wAnn %*% gderiv )
+		}			
+	}	
+	for ( d in 1:nAnn ) {   
+		message( "Annotation #",d,":") 	
+		message( "    ", paste( round(q1ratio[d,]*vDigit)/vDigit, collapse=" " ) )
+		message( "  ( ", paste( round(q1ratioSE[d,]*vDigit)/vDigit, collapse=" " ), " )" )
 	}
 	message( " " )
     message( "test statistics: ", paste( round(LRT*vDigit)/vDigit, collapse=" " ) )

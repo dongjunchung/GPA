@@ -32,15 +32,14 @@ RcppExport SEXP cppEM(
 	double lbBetaAlphaVal = as<double>( lbBetaAlpha );
 	double lbQVal = as<double>( lbQ );
 	
-	Rcpp::NumericMatrix binaryMatMat(binaryMat);
-	Rcpp::NumericMatrix gwasPvalMat(gwasPval);
+	Rcpp::NumericMatrix binaryMatMat( binaryMat );
+	Rcpp::NumericMatrix gwasPvalMat( gwasPval );
+	Rcpp::NumericMatrix annMatMat( annMat );   
 	
-	Rcpp::NumericVector betaAlphaVec(betaAlpha);
-	Rcpp::NumericVector betaAlphaNullVec(betaAlphaNull);
-	Rcpp::NumericVector pisVec(pis);
-	
-	Rcpp::NumericMatrix annMatMat(annMat);   
-	Rcpp::NumericMatrix q1Mat(q1);   
+	Rcpp::NumericVector betaAlphaVec( Rcpp::clone(betaAlpha) );
+	Rcpp::NumericVector betaAlphaNullVec( Rcpp::clone(betaAlphaNull) );
+	Rcpp::NumericVector pisVec( Rcpp::clone(pis) );	
+	Rcpp::NumericMatrix q1Mat( Rcpp::clone(q1) );
 	
 	int nBin = gwasPvalMat.nrow();
 	int nGWAS = gwasPvalMat.ncol();
@@ -150,7 +149,7 @@ RcppExport SEXP cppEM(
 		}
 		
 		if ( useAnnVal == 1 ) {
-			Rcout << "q1: " << std::endl;
+			Rcout << "q: " << std::endl;
 			for ( int d = 0; d < nAnn; d++ ) {
 				for ( int g = 0; g < nComp; g++ ) {  
 					Rcout << round( vDigitVal * q1Mat( d, g ) ) / vDigitVal << " ";
@@ -453,7 +452,7 @@ RcppExport SEXP cppEM(
 			}
 			
 			if ( useAnnVal == 1 ) {
-				Rcout << "q1: " << std::endl;
+				Rcout << "q: " << std::endl;
 				for ( int d = 0; d < nAnn; d++ ) {
 					for ( int g = 0; g < nComp; g++ ) {  
 						Rcout << round( vDigitVal * q1Mat( d, g ) ) / vDigitVal << " ";
@@ -586,7 +585,7 @@ RcppExport SEXP cppEM(
 	}
     
     // prepare the list to return
-    
+	
 	Rcpp::List emResult;
 	
 	emResult["Z"] = zMat;
@@ -605,6 +604,5 @@ RcppExport SEXP cppEM(
 	
 	emResult["maxIter"] = ii;
 	
-	return(emResult);
-
+	return( emResult );	
 }

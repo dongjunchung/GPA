@@ -8,8 +8,8 @@ Fit GPA model.
 }
 \usage{
 GPA( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
-	maxIter=2000, stopping="relative", epsStopLL=1e-100,
-	initBetaMean=0.1, initPi=0.1, initQ1=0.75,
+	maxIter=2000, stopping="relative", epsStopLL=1e-10,
+	initBetaAlpha=0.1, initPi=0.1, initQ=0.75,
 	lbPi=NA, lbBetaAlpha=0.001, lbQ=0.001, lbPval=1e-30,
 	vDigit=1000, verbose=1 )
 }
@@ -28,11 +28,15 @@ GPA( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
         or \code{FALSE} (theoretical null distribution).
         Default is \code{FALSE}. }        
 	\item{maxIter}{Maximum number of EM iteration. Default is 2000.}  
-    \item{stopping}{Stopping rule for EM iteration. Possible values are \code{"absolute"} (based on absolute difference in log likelihood), \code{"relative"} (based on relative difference in log likelihood), or  \code{"aitken"} (based on Aitken acceleration-based stopping rule). Default is \code{"relative"}.}
+    \item{stopping}{Stopping rule for EM iteration. 
+		Possible values are \code{"absolute"} (based on absolute difference in log likelihood), 
+		\code{"relative"} (based on relative difference in log likelihood), or  
+		\code{"aitken"} (based on Aitken acceleration-based stopping rule). 
+		Default is \code{"relative"}.}
 	\item{epsStopLL}{Threshold to stop the EM iteration. Default is 1e-100.}  
-	\item{initBetaMean}{Initial value for alpha estimate. Default is 0.1.}  
+	\item{initBetaAlpha}{Initial value for alpha estimate. Default is 0.1.}  
 	\item{initPi}{Initial value for pi estimate. Default is 0.1.} 
-	\item{initQ1}{Initial value for q estimate. Default is 0.75.} 
+	\item{initQ}{Initial value for q estimate. Default is 0.75.} 
 	\item{lbPi}{Lower bound for pi estimate. 
 		If \code{lbPi=NA}, lower bound is set to 1 / [number of SNPs].
 		Default is \code{NA}.}  
@@ -73,7 +77,7 @@ by integrating pleiotropy information and annotation data."
 }
 \author{ Dongjun Chung }
 \seealso{
-\code{\link{pTest}}, \code{\link{aTest}}, 
+\code{\link{assoc}}, \code{\link{pTest}}, \code{\link{aTest}}, 
 \code{\linkS4class{GPA}}.
 }
 \examples{

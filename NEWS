@@ -1,4 +1,18 @@
+      
+Changes in version 0.9.1:
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o Add fdr() to provide local FDR that a SNP is not associated with each phenotype.
    
+   o Add assoc() for association mapping.
+   
+   o The function aTest() and methods show() and cov() for class 'GPA' now provide estimates and standard error for the ratio of q in each association class over the baseline.
+   
+   o In GPA(), 'initBetaMean' argument is replaced with 'initBetaAlpha'.
+   
+   o Generally improve robustness of functions by checking input for arguments.
+
 Changes in version 0.9.0:
 
    o The first version of GPA R package.

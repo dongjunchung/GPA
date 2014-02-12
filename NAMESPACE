@@ -2,6 +2,6 @@ useDynLib(GPA)
 
 import( methods, graphics, Rcpp )
 
-export( GPA, aTest, pTest )
+export( GPA, assoc, aTest, pTest )
 
-export( show, print, cov, estimates )
+export( show, print, fdr, cov, estimates )

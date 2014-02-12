@@ -3,12 +3,67 @@
 
 GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 	maxIter=2000, stopping="relative", epsStopLL=1e-10,
-	initBetaMean=0.1, initPi=0.1, initQ1=0.75,
+	initBetaAlpha=0.1, initPi=0.1, initQ=0.75,
 	lbPi=NA, lbBetaAlpha=0.001, lbQ=0.001, lbPval=1e-30,
 	vDigit=1000, verbose=1 ) {
-		
-	# gwasPval: M * K matrix (p-value, [ 0, 1 ] )
-	# annMat: M * D matrix (binary, { 0, 1 } )
+
+	# check correctness of arguments
+	
+	if ( pleiotropyH0 != TRUE & pleiotropyH0 != FALSE ) {
+		stop( "Inappropriate value for 'pleiotropyH0' argument. It should be either TRUE or FALSE." )
+	}
+	
+	if ( empiricalNull != TRUE & empiricalNull != FALSE ) {
+		stop( "Inappropriate value for 'empiricalNull' argument. It should be either TRUE or FALSE." )
+	}
+	
+	if ( maxIter %% 1 != 0 | maxIter <= 0 ) {
+		stop( "Inappropriate value for 'maxIter' argument. It should be positive integer." )
+	}
+	
+	if ( stopping != "absolute" & stopping != "relative" & stopping != "aitken" ) {
+		stop( "Inappropriate value for 'stopping' argument. It should be one of 'absolute' (absolute difference in log likelihood), 'relative' (relative difference in log likelihood), and 'aitken' (Aitken acceleration-based stopping rule)." )
+	}
+	
+	if ( epsStopLL < 0 ) {
+		stop( "Inappropriate value for 'epsStopLL' argument. It should be nonnegative." )
+	}
+	
+	if ( initBetaAlpha <= 0 | initBetaAlpha >= 1 ) {
+		stop( "Inappropriate value for 'initBetaAlpha' argument. It should be between zero and one." )
+	}
+	
+	if ( initPi <= 0 | initPi >= 1 ) {
+		stop( "Inappropriate value for 'initPi' argument. It should be between zero and one." )
+	}
+	
+	if ( initQ <= 0 | initQ >= 1 ) {
+		stop( "Inappropriate value for 'initQ' argument. It should be between zero and one." )
+	}
+	
+	if ( !is.na(lbPi) && ( lbPi <= 0 | lbPi >= 1 ) ) {
+		stop( "Inappropriate value for 'lbPi' argument. It should be NA ('lbPi' = 1 / [number of SNPs]) or some value between zero and one." )
+	}
+	
+	if ( lbBetaAlpha <= 0 | lbBetaAlpha >= 1 ) {
+		stop( "Inappropriate value for 'lbBetaAlpha' argument. It should be between zero and one." )
+	}
+	
+	if ( lbQ <= 0 | lbQ >= 1 ) {
+		stop( "Inappropriate value for 'lbQ' argument. It should be between zero and one." )
+	}
+	
+	if ( lbPval <= 0 | lbPval >= 1 ) {
+		stop( "Inappropriate value for 'lbPval' argument. It should be between zero and one." )
+	}
+	
+	if ( vDigit %% 10 != 0 | vDigit <= 0 ) {
+		stop( "Inappropriate value for 'vDigit' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+	}	
+	
+	if ( verbose != 0 & verbose != 1 & verbose != 2 & verbose != 3 ) {
+		stop( "Inappropriate value for 'verbose' argument. It should be one of 0, 1, 2, or 3." )
+	}
 	
 	# convert p-value & annotation vector to matrix, if needed, for consistency
 	
@@ -22,10 +77,22 @@ GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 	}	
 	
 	# check correctness of data
+	# gwasPval: M * K matrix (p-value, [ 0, 1 ] )
+	# annMat: M * D matrix (binary, { 0, 1 } )
 	
 	if ( !is.null(annMat) ) {
 		if ( nrow(gwasPval) != nrow(annMat) ) {
-			stop( "Number of SNPs are different between p-value and annotation matrices. Please check your p-value and annotation matrices!")
+			stop( "Number of SNPs are different between p-value and annotation matrices. They should coincide. Please check your p-value and annotation matrices.")
+		}
+	}
+	
+	if ( any( gwasPval < 0 | gwasPval > 1 ) ) {
+		stop( "Some p-values are smaller than zero or larger than one. p-value should be ranged between zero and one. Please check your p-value matrix." )
+	}
+	
+	if ( !is.null(annMat) ) {
+		if ( any( annMat != 0 & annMat != 1 ) ) {
+			stop( "Some elements in annotation matrix has values other than zero or one. All the elements in annotation matrix should be either zero (not annotated) or one (annotated). Please check your annotation matrix." )
 		}
 	}
 	
@@ -92,7 +159,8 @@ GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 	
 	# initialization of parameters
 	
-	betaAlpha <- rep( initBetaMean / ( 1 - initBetaMean ), nGWAS )
+	#betaAlpha <- rep( initBetaMean / ( 1 - initBetaMean ), nGWAS )
+	betaAlpha <- rep( initBetaAlpha, nGWAS )
 	betaAlphaNull <- rep( 1, nGWAS )
 	
 	pis <- initPi^rowSums(binaryMat)
@@ -102,16 +170,16 @@ GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 	pis[ rowSums(binaryMat) == 0 ] <- 1 - sum( pis[ rowSums(binaryMat) != 0 ] )
 	
 	if ( !is.null(annMat) ) {
-		q1 <- matrix( initQ1, nAnn, nComp )
+		q1 <- matrix( initQ, nAnn, nComp )
 	} else {
-		q1 <- as.matrix(1)
+		q1 <- matrix( rep(1,4), 2, 2 )
 	}
     
     # EM step
     
     useAnn <- as.numeric( !is.null(annMat) )
     if ( is.null(annMat) ) {
-	    annMat <- as.matrix(1)
+	    annMat <- matrix( rep(1,4), 2, 2 )
     }
     stoppingCode <- switch( stopping,
     	absolute = 1,
@@ -130,12 +198,13 @@ GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 	
 	#emResult$empiricalNull <- empiricalNull
 	
-	emResult$finalIter <- emResult$maxIter	
-	emResult$piMat = as.matrix( emResult$piMat[ 1:(emResult$finalIter), ] )
-	emResult$betaAlphaMat = as.matrix( emResult$betaAlphaMat[ 1:(emResult$finalIter), ] )
-	emResult$betaAlphaNullMat = as.matrix( emResult$betaAlphaNullMat[ 1:(emResult$finalIter), ] )
-	emResult$loglik = emResult$loglik[ 1:(emResult$finalIter) ]
-	emResult$q1Array = as.matrix( emResult$q1Array[ 1:(emResult$finalIter), ] )
+	emResult$finalIter <- emResult$maxIter
+			
+	emResult$piMat <- emResult$piMat[ 1:(emResult$finalIter), , drop=FALSE ]
+	emResult$betaAlphaMat <- emResult$betaAlphaMat[ 1:(emResult$finalIter), , drop=FALSE ]
+	emResult$betaAlphaNullMat <- emResult$betaAlphaNullMat[ 1:(emResult$finalIter), , drop=FALSE ]
+	emResult$loglik <- emResult$loglik[ 1:(emResult$finalIter) ]
+	emResult$q1Array <- emResult$q1Array[ 1:(emResult$finalIter), , drop=FALSE ]
 	
 	colnames(emResult$Z) <- names(emResult$pis) <- colnames(emResult$piMat) <- combVec
 	
@@ -165,9 +234,9 @@ GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 	emSetting$maxIter <- maxIter
 	emSetting$stopping <- stopping
 	emSetting$epsStopLL <- epsStopLL
-	emSetting$initBetaMean <- initBetaMean
+	emSetting$initBetaAlpha <- initBetaAlpha
 	emSetting$initPi <- initPi
-	emSetting$initQ1 <- initQ1
+	emSetting$initQ1 <- initQ
 	emSetting$lbPi <- lbPi
 	emSetting$lbBetaAlpha <- lbBetaAlpha
 	emSetting$lbQ <- lbQ

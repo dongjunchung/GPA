@@ -88,8 +88,9 @@ setMethod(
 		cat( "\tpi: ", paste( round(pis*vDigit)/vDigit, collapse=" " ), "\n", sep="" )
 		cat( "\t  ( ", paste( round(piSE*vDigit)/vDigit, collapse=" " ), " )", "\n", sep="" )
 		if ( emSetting$useAnn ) {
-			cat( "\tq1:\n" )
-			for ( d in 1:nAnn ) {    	
+			cat( "\tq:\n" )
+			for ( d in 1:nAnn ) { 
+				cat( "\tAnnotation #",d,":\n", sep="" )			
 				cat( "\t    ", paste( round(q1[d,]*vDigit)/vDigit, collapse=" " ), "\n", sep="" )
 				
 				if ( emSetting$empiricalNull ) {
@@ -98,6 +99,34 @@ setMethod(
 					locQ1 <- (nPis-1+nAlpha+nPis*(d-1)+1):(nPis-1+nAlpha+nPis*d)
 				}
 				cat( "\t  ( ", paste( round(seVec[locQ1]*vDigit)/vDigit, collapse=" " ), " )", "\n", sep="" )
+			}
+		}
+		if ( emSetting$useAnn ) {
+			q1ratio <- q1ratioSE <- matrix( NA, nrow(q1), (ncol(q1)-1) )
+			for ( d in 1:nAnn ) {
+				# estimates
+				
+				q1ratio[d,] <- q1[d,-1] / q1[d,1]
+				
+				# SE
+				
+				for ( j in 2:ncol(q1) ) {
+					qderiv <- rep( 0, nrow(q1)*ncol(q1) )
+					qderiv[ ncol(q1) * (d-1) + 1 ] <- - q1[d,j] / q1[d,1]^2
+					qderiv[ ncol(q1) * (d-1) + j ] <- 1 / q1[d,1]
+					
+					gderiv <- as.matrix( c( rep( 0, nrow(covMat) - nrow(q1)*ncol(q1) ), qderiv ) )
+					q1ratioSE[d,(j-1)] <- sqrt( t(gderiv) %*% covMat %*% gderiv )
+				}			
+			}
+			
+			cat( "\n" )
+			cat( "\tRatio of q over baseline (",combVec[1],"):\n", sep="" )
+			cat( "\tGWAS combination: ", paste( combVec[-1], collapse=" " ),"\n", sep="" )
+			for ( d in 1:nAnn ) {    	
+				cat( "\tAnnotation #",d,":\n", sep="" )
+				cat( "\t    ", paste( round(q1ratio[d,]*vDigit)/vDigit, collapse=" " ), "\n", sep="" )
+				cat( "\t  ( ", paste( round(q1ratioSE[d,]*vDigit)/vDigit, collapse=" " ), " )", "\n", sep="" )
 			}
 		}
         cat( "--------------------------------------------------\n" )
@@ -111,6 +140,19 @@ setMethod(
         # return posterior probability matrix
 		
 		return(x@fit$Z)
+    }
+)
+
+setMethod(
+    f="fdr",
+    signature="GPA",
+    definition=function( object ) {
+        # return marginal local FDR
+		
+		margfdr <- 1 - object@fit$Zmarg
+		colnames(margfdr) <- colnames(object@gwasPval)
+		
+		return(margfdr)
     }
 )
 

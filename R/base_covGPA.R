@@ -1,5 +1,20 @@
 
 .covGPA <- function( object, silent=FALSE, vDigitEst=1000, vDigitSE=1000 ) {
+	# check correctness of arguments
+	
+	if ( silent != TRUE & silent != FALSE ) {
+		stop( "Inappropriate value for 'silent' argument. It should be either TRUE or FALSE." )
+	}
+	
+	if ( vDigitEst %% 10 != 0 | vDigitEst <= 0 ) {
+		stop( "Inappropriate value for 'vDigitEst' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+	}
+	
+	if ( vDigitSE %% 10 != 0 | vDigitSE <= 0 ) {
+		stop( "Inappropriate value for 'vDigitSE' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+	}
+	
+	# load fits
 	
 	emSetting <- object@setting
 	gwasPval <- object@gwasPval
@@ -186,53 +201,66 @@
 	# report
 	
 	if( !silent ) {
-		if ( empiricalNull ) {
-				
-			locPi <- 1:(nPis-1)
-			locAlpha <- (nPis-1+1):(nPis-1+nAlpha)
-			locAlpha0 <- (nPis-1+nAlpha+1):(nPis-1+nAlpha+nAlpha)
+		locPi <- 1:(nPis-1)
+		locAlpha <- (nPis-1+1):(nPis-1+nAlpha)		
 		    
-			message( " " )
-			message( "GWAS combination: ", paste( combVec, collapse=" " ) )
-		    message( "pi: ", paste( round(pis*vDigitEst)/vDigitEst, collapse=" " ) )
-		    message( "  ( ", paste( round(piSE*vDigitSE)/vDigitSE, collapse=" " ), " )" )
-			message( "alpha: ", paste( round(betaAlpha*vDigitEst)/vDigitEst, collapse=" " ) )
-			message( "     ( ", paste( round(sqrt(diag(covEst))[locAlpha]*vDigitSE)/vDigitSE, collapse=" " ), " )" )
+		message( " " )
+		message( "alpha: ", paste( round(betaAlpha*vDigitEst)/vDigitEst, collapse=" " ) )
+		message( "     ( ", paste( round(sqrt(diag(covEst))[locAlpha]*vDigitSE)/vDigitSE, collapse=" " ), " )" )
+		
+		if ( empiricalNull ) {
+			locAlpha0 <- (nPis-1+nAlpha+1):(nPis-1+nAlpha+nAlpha)
 			message( "alpha0: ", paste( round(betaAlphaNull*vDigitEst)/vDigitEst, collapse=" " ) )
 			message( "     ( ", paste( round(sqrt(diag(covEst))[locAlpha0]*vDigitSE)/vDigitSE, collapse=" " ), " )" )
-		    
-			if ( !is.null(annMat) ) {    
-				message( "q1: " )
-				for ( d in 1:nAnn ) {
+		}
+		message( "GWAS combination: ", paste( combVec, collapse=" " ) )
+		message( "pi: ", paste( round(pis*vDigitEst)/vDigitEst, collapse=" " ) )
+		message( "  ( ", paste( round(piSE*vDigitSE)/vDigitSE, collapse=" " ), " )" )
+		
+		if ( !is.null(annMat) ) {    
+			# q
+			
+			message( "q: " )
+			for ( d in 1:nAnn ) {
+				message( "Annotation #",d,":")
+				if ( empiricalNull ) {
 					locQ1 <- (nPis-1+2*nAlpha+nPis*(d-1)+1):(nPis-1+2*nAlpha+nPis*d)
-					
-			    	message( "  ", paste( round(q1[d,]*vDigitEst)/vDigitEst, collapse=" " ) )
-			    	message( "( ", paste( round(sqrt(diag(covEst))[locQ1]*vDigitSE)/vDigitSE, collapse=" " ), " )" )
-		    	}
-			}
-			
-		} else {
-			
-			locPi <- 1:(nPis-1)
-			locAlpha <- (nPis-1+1):(nPis-1+nAlpha)
-		    
-			message( " " )
-			message( "GWAS combination: ", paste( combVec, collapse=" " ) )
-		    message( "pi: ", paste( round(pis*vDigitEst)/vDigitEst, collapse=" " ) )
-		    message( "  ( ", paste( round(piSE*vDigitSE)/vDigitSE, collapse=" " ), " )" )
-			message( "alpha: ", paste( round(betaAlpha*vDigitEst)/vDigitEst, collapse=" " ) )
-			message( "     ( ", paste( round(sqrt(diag(covEst))[locAlpha]*vDigitSE)/vDigitSE, collapse=" " ), " )" )
-		    
-			if ( !is.null(annMat) ) {    
-				message( "q1: " )
-				for ( d in 1:nAnn ) {
+				} else {
 					locQ1 <- (nPis-1+nAlpha+nPis*(d-1)+1):(nPis-1+nAlpha+nPis*d)
-					
-			    	message( "  ", paste( round(q1[d,]*vDigitEst)/vDigitEst, collapse=" " ) )
-			    	message( "( ", paste( round(sqrt(diag(covEst))[locQ1]*vDigitSE)/vDigitSE, collapse=" " ), " )" )
-		    	}
+				}
+				
+				message( "\t    ", paste( round(q1[d,]*vDigitEst)/vDigitEst, collapse=" " ) )
+				message( "\t  ( ", paste( round(sqrt(diag(covEst))[locQ1]*vDigitSE)/vDigitSE, collapse=" " ), " )" )
 			}
 			
+			# ratio of q
+			
+			q1ratio <- q1ratioSE <- matrix( NA, nrow(q1), (ncol(q1)-1) )
+			for ( d in 1:nAnn ) {
+				# estimates
+				
+				q1ratio[d,] <- q1[d,-1] / q1[d,1]
+				
+				# SE
+				
+				for ( j in 2:ncol(q1) ) {
+					qderiv <- rep( 0, nrow(q1)*ncol(q1) )
+					qderiv[ ncol(q1) * (d-1) + 1 ] <- - q1[d,j] / q1[d,1]^2
+					qderiv[ ncol(q1) * (d-1) + j ] <- 1 / q1[d,1]
+					
+					gderiv <- as.matrix( c( rep( 0, nrow(covEst) - nrow(q1)*ncol(q1) ), qderiv ) )
+					q1ratioSE[d,(j-1)] <- sqrt( t(gderiv) %*% covEst %*% gderiv )
+				}			
+			}
+			
+			message( " " )
+			message( "Ratio of q over baseline (",combVec[1],"):" )
+			message( "GWAS combination: ", paste( combVec[-1], collapse=" " ) )
+			for ( d in 1:nAnn ) {
+				message( "Annotation #",d,":")
+				message( "\t    ", paste( round(q1ratio[d,]*vDigitEst)/vDigitEst, collapse=" " ) )
+				message( "\t  ( ", paste( round(q1ratioSE[d,]*vDigitSE)/vDigitSE, collapse=" " ), " )" )
+			}
 		}
 	}
 	

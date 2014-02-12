@@ -1,5 +1,20 @@
 
 pTest <- function( fit, fitH0, vDigit=1000 ) {
+	# check correctness of arguments
+	
+	if ( !is( fit, "GPA" ) ) {
+		stop( " Input for 'fit' argument is not 'GPA' class object. Please check the input." )
+	}
+	
+	if ( !is( fitH0, "GPA" ) ) {
+		stop( " Input for 'fitH0' argument is not 'GPA' class object. Please check the input." )
+	}
+	
+	if ( vDigit %% 10 != 0 | vDigit <= 0 ) {
+		stop( "Inappropriate value for 'vDigit' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+	}
+	
+	# load fits
 	
 	pis <- fit@fit$pis
 	covMat <- cov( fit, silent=TRUE )
