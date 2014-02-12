@@ -5,11 +5,11 @@ GPA is a statistical approach to prioritizing GWAS results by integrating pleiot
 
 The stable versions of GPA package can be obtained from the following URLs:
 
-Package source: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-0.tar.gz?raw=true
+Package source: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-1.tar.gz?raw=true
 
-Windows binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-0.zip?raw=true
+Windows binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-1.zip?raw=true
 
-Mac OS/X binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-0.tgz?raw=true
+Mac OS/X binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-1.tgz?raw=true
 
 
 Development
