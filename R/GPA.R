@@ -58,7 +58,7 @@ GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 	}
 	
 	if ( vDigit %% 10 != 0 | vDigit <= 0 ) {
-		stop( "Inappropriate value for 'vDigit' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+		stop( "Inappropriate value for 'vDigit' argument. It should be multiples of 10, e.g., 10, 100, ..." )
 	}	
 	
 	if ( verbose != 0 & verbose != 1 & verbose != 2 & verbose != 3 ) {
@@ -164,10 +164,14 @@ GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 	betaAlphaNull <- rep( 1, nGWAS )
 	
 	pis <- initPi^rowSums(binaryMat)
+	if ( sum(pis[2:nComp]) >= 1 ) {
+		pis[2:nComp] <- 0.4 * pis[2:nComp] / sum(pis[2:nComp])
+	}
+	pis[ rowSums(binaryMat) == 0 ] <- 1 - sum( pis[ rowSums(binaryMat) != 0 ] )
 	if ( any( pis < lbPi ) ) {
 		pis[ pis < lbPi ] <- lbPi
 	}
-	pis[ rowSums(binaryMat) == 0 ] <- 1 - sum( pis[ rowSums(binaryMat) != 0 ] )
+	pis <- pis / sum(pis)
 	
 	if ( !is.null(annMat) ) {
 		q1 <- matrix( initQ, nAnn, nComp )

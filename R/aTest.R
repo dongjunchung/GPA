@@ -11,7 +11,7 @@ aTest <- function( fitWithoutAnn, fitWithAnn, vDigit=1000 ) {
 	}
 	
 	if ( vDigit %% 10 != 0 | vDigit <= 0 ) {
-		stop( "Inappropriate value for 'vDigit' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+		stop( "Inappropriate value for 'vDigit' argument. It should be multiples of 10, e.g., 10, 100, ..." )
 	}
 	
 	# load fits

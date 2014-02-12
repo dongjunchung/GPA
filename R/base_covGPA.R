@@ -7,11 +7,11 @@
 	}
 	
 	if ( vDigitEst %% 10 != 0 | vDigitEst <= 0 ) {
-		stop( "Inappropriate value for 'vDigitEst' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+		stop( "Inappropriate value for 'vDigitEst' argument. It should be multiples of 10, e.g., 10, 100, ..." )
 	}
 	
 	if ( vDigitSE %% 10 != 0 | vDigitSE <= 0 ) {
-		stop( "Inappropriate value for 'vDigitSE' argument. It should be multiples of 10, e.g., 1, 10, 100, ..." )
+		stop( "Inappropriate value for 'vDigitSE' argument. It should be multiples of 10, e.g., 10, 100, ..." )
 	}
 	
 	# load fits
