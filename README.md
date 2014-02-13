@@ -11,6 +11,16 @@ Windows binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-1
 
 Mac OS/X binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-1.tgz?raw=true
 
+Usage
+===========
+
+The following two help pages provide a good start point for the genetic analysis using GPA package, including the overview of GPA package and the example command lines:
+
+```
+library(GPA)
+package?GPA
+class?GPA
+```
 
 Development
 ===========
