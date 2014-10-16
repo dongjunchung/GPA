@@ -5,11 +5,13 @@ GPA is a statistical approach to prioritizing GWAS results by integrating pleiot
 
 The stable versions of GPA package can be obtained from the following URLs:
 
-Package source: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-1.tar.gz?raw=true
+Package source: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.tar.gz?raw=true
 
-Windows binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-1.zip?raw=true
+Windows binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.zip?raw=true
 
-Mac OS/X binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-1.tgz?raw=true
+Mac OS/X binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.tgz?raw=true
+
+GPA vignette provides a good start point for the step-by-step data analysis using GPA package and it can be found at Package source: https://github.com/dongjunchung/GPA_binary/blob/master/inst/doc/GPA-example.pdf?raw=true. Please check https://groups.google.com/d/forum/gpa-user-group for discussions and questions regarding genetic data analysis using GPA package. You can track development of GPA package at http://github.com/dongjunchung/GPA.
 
 Usage
 ===========
