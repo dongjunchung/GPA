@@ -1,0 +1,285 @@
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+\documentclass[11pt]{article}
+%% Set my margins
+\setlength{\oddsidemargin}{0.0truein}
+\setlength{\evensidemargin}{0.0truein}
+\setlength{\textwidth}{6.5truein}
+\setlength{\topmargin}{0.0truein}
+\setlength{\textheight}{9.0truein}
+\setlength{\headsep}{0.0truein}
+\setlength{\headheight}{0.0truein}
+\setlength{\topskip}{0pt}
+%% End of margins
+
+\usepackage{subfigure}
+
+%%\pagestyle{myheadings}
+%%\markboth{$Date$\hfil$Revision$}{\thepage}
+\usepackage[pdftex,
+bookmarks, 
+bookmarksopen,
+pdfauthor={Dongjun Chung},
+pdftitle={GPA Vignette}]
+{hyperref}
+
+\title{Genetic Analysis incorporating Pleiotropy and Annotation\\
+with `\texttt{GPA}' Package}
+\author{Dongjun Chung$~^1$, Can Yang$~^2$, Cong Li$~^3$, Joel Gelernter$~^{4,5,6,7}$, and Hongyu Zhao$~^{3,6,8,9}$\\
+$~^1$Department of Public Health Sciences, Medical University of South Carolina,\\
+Charleston, SC, USA.\\
+$~^2$ Department of Mathematics, Hong Kong Baptist University,\\
+Hong Kong.\\
+$~^3$ Program in Computational Biology and Bioinformatics, Yale University,\\
+New Haven, CT, USA.\\
+$~^4$ Department of Psychiatry, Yale School of Medicine,\\
+New Haven, CT, USA.\\
+$~^5$ VA CT Healthcare Center, West Haven, CT, USA.\\
+$~^6$ Department of Genetics, Yale School of Medicine, West Haven, CT, USA.\\
+$~^7$ Department of Neurobiology, Yale School of Medicine, New Haven, CT, USA.\\
+$~^8$ Department of Biostatistics, Yale School of Public Health,\\
+New Haven, CT, USA.\\
+$~^9$ VA Cooperative Studies Program Coordinating Center, West Haven, CT, USA.
+}
+
+\date{\today}
+
+\SweaveOpts{engine=R, echo=TRUE, pdf=TRUE}
+
+\begin{document}
+%\VignetteIndexEntry{GPA}
+%\VignetteKeywords{GPA}
+%\VignettePackage{GPA}
+\maketitle
+
+%\tableofcontents
+
+\section{Overview}
+
+This vignette provides an introduction to the genetic analysis using the `\texttt{GPA}' package. 
+R package `\texttt{GPA}' implements GPA (\textbf{G}enetic analysis incorporating \textbf{P}leiotropy and \textbf{A}nnotation),
+a flexible statistical framework for the joint analysis of multiple genome-wide association studies (GWAS)
+and its integration with various genetic and genomic data.
+It implements a flexible parametric mixture modeling approach for such integrative analysis
+and also provides hypothesis testing procedures for pleiotropy and annotation enrichment.
+
+The package can be loaded with the command:
+
+<<preliminaries,echo=FALSE,results=hide>>=
+options(prompt = "R> ")
+@
+
+<<GPA-prelim>>=
+library("GPA")
+@
+
+This vignette is organized as follows.
+Section \ref{fitting} discusses how to fit GPA models in various settings.
+Section \ref{association} explains command lines for association mapping using GPA.
+Section \ref{testing} discusses steps of the hypothesis testing for pleiotropy and annotation enrichment.
+Finally, Section \ref{advanced} discusses some methods useful for more advanced users.
+
+We encourage questions or requests regarding `\texttt{GPA}' package to be posted on our Google group \url{https://groups.google.com/d/forum/gpa-user-group}. Users can find the most up-to-date versions of `\texttt{GPA}' package in our GitHub webpage (\url{http://dongjunchung.github.io/GPA/}).
+%Always feel free to contact Dongjun Chung at \texttt{chungd@musc.edu} for any questions or suggestions regarding the `\texttt{GPA}' package.
+
+\section{Workflow}\label{workflow}
+
+\textbf{[Note]}
+
+\textbf{All the results below are based on the 100 EM iterations for quick testing and building of the R package.
+These results are provided here only for the illustration purpose and should not be considered as real results.
+We recommend users to use sufficient number of EM iterations for the real data analysis,
+as we use 10,000 EM iterations for all the results in our manuscript \cite{GPA}.}\\
+
+In this vignette, we use the GWAS data of five psychiatric disorders \cite{PGC1, PGC2}, where traits include attention deficit-hyperactivity disorder (ADHD), autism spectrum disorder (ASD), bipolar disorder (BPD), major depressive disorder (MDD), and schizophrenia (SCZ). We downloaded summary statistics of the five psychiatric disorders from the section for cross-disorder analysis at the Psychiatric Genomics Consortium (PGC) website and took the intersection of their SNPs, resulting in a $p$-value matrix of $1,219,805 \times 5$. We also consider the binary annotation data using genes preferentially expressed in the central nervous system (CNS) as an annotation data \cite{ann1, ann2}. We generated an annotation matrix of size $1,219,805 \times 1$, where the entries corresponding to SNPs within 50-kb of the genes from the CNS set were set to be one and zero otherwise. `\texttt{gpaExample}' package provides this example dataset.
+
+<<mosaicsExample-prelim>>=
+library(gpaExample)
+data(exampleData)
+dim(exampleData$pval)
+head(exampleData$pval)
+dim(exampleData$ann)
+head(exampleData$ann)
+table(exampleData$ann)
+@
+
+\subsection{Fitting the GPA Model}\label{fitting}
+
+We are now ready to fit a GPA model using the GWAS $p$-value data described above (\texttt{exampleData\$pval}).
+R package \texttt{GPA} provides flexible analysis framework
+and automatically adjusts its model structure based on the provided data.
+However, we note that although, in principle, any number of GWAS data can be analyzed in the GPA model, R package \texttt{GPA} has been investigated and tested most extensively for the case of two GWAS data. Hence, if users have more than two GWAS data of interest, we recommend users to analyze each pair of GWAS data at a time. Based on this rationale, in this vignette, we focus on the joint analysis of BPD and SCZ,
+which correspond to the third and fifth columns of \texttt{exampleData\$pval}.
+
+First, assuming that there is no annotation data, we fit the GPA model with the command:
+<<GPA-noann-show,eval=FALSE>>=
+fit.GPA.noAnn <- GPA( exampleData$pval[ , c(3,5) ], NULL )
+@
+<<GPA-noann-run,echo=FALSE,results=hide>>=
+fit.GPA.noAnn <- GPA( exampleData$pval[ , c(3,5) ], NULL, maxIter=100 )
+@
+or equivalently (which is actually simpler command),
+<<GPA-noann-simple,eval=FALSE>>=
+fit.GPA.noAnn <- GPA( exampleData$pval[ , c(3,5) ] )
+@
+
+When we also have related annotation data, this annotation data can be easily incorporated into the GPA model
+by providing it in the second argument of `\texttt{GPA}' method.
+Note that `\texttt{GPA}' method expects that the number of rows of data in the first and second arguments are same
+and also the elements of data in the second argument are either one (annotated) or zero (otherwise).
+<<GPA-ann-show,eval=FALSE>>=
+fit.GPA.wAnn <- GPA( exampleData$pval[ , c(3,5) ], exampleData$ann )
+@
+<<GPA-ann-run,echo=FALSE,results=hide>>=
+fit.GPA.wAnn <- GPA( exampleData$pval[ , c(3,5) ], exampleData$ann, maxIter=100 )
+@
+
+The following command prints out a summary of GPA model fit,
+including data summary, model setting, parameter estimates, and their standard errors.
+<<GPA-show-ann>>=
+fit.GPA.wAnn
+@
+Parameter estimates and their standard errors can be extracted 
+using methods `\texttt{estimates}' and `\texttt{se}', respectively.
+<<GPA-estimates-se-ann>>=
+estimates( fit.GPA.wAnn )
+se( fit.GPA.wAnn )
+@
+
+\subsection{Association Mapping}\label{association}
+
+Now, based on the fitted GPA model, we implement association mapping with the command:
+<<GPA-assoc-ann>>=
+assoc.GPA.wAnn <- assoc( fit.GPA.wAnn, FDR=0.20, fdrControl="global" )
+dim(assoc.GPA.wAnn)
+head(assoc.GPA.wAnn)
+table(assoc.GPA.wAnn[,1])
+table(assoc.GPA.wAnn[,2])
+@
+`\texttt{assoc}' method returns a binary matrix indicating association of each SNP, 
+where one indicates that a SNP is associated with the phenotype and zero otherwise. 
+Its rows and columns match those of input $p$-value matrix for `\texttt{GPA}' method.
+`\texttt{assoc}' method allows both local (`\texttt{fdrControl="local"}') and global FDR controls (`\texttt{fdrControl="global"}') and users can control FDR level using the argument `\texttt{FDR}'. 
+Hence, the association mapping results above indicate that
+there are 1,345 and 6,309 SNPs associated with each of BPD and SCZ, respectively,
+under the global FDR control at 0.20 level.
+
+`\texttt{fdr}' method for the output of `\texttt{GPA}' method (`\texttt{fit.GPA.wAnn}' in this example) further
+provides the matrix of local FDR that a SNP is not associated with each phenotype, 
+where its rows and columns match those of input $p$-value matrix for `\texttt{GPA}' method.
+This method will be useful when users want to scrutinize association of each SNP more closely.
+<<GPA-fdr-ann>>=
+fdr.GPA.wAnn <- fdr(fit.GPA.wAnn)
+dim(fdr.GPA.wAnn)
+head(fdr.GPA.wAnn)
+@
+
+When users are interested in the association of a SNP for certain combination of phenotypes,
+users can specify it using `\texttt{pattern}' argument in both `\texttt{assoc}' and `\texttt{fdr}' methods. 
+Specifically, users can specify the pattern using 1 and *,
+where 1 and * indicate phenotypes of interest and phenotypes that are not of interest, respectively.
+For example, when there are three phenotypes,
+`\texttt{pattern="111"}' means a SNP associated with all of three phenotypes,
+while `\texttt{pattern="11*"}'s means a SNP associated with the first two phenotypes
+(i.e., association with the third phenotype is ignored (averaged out)).
+If a pattern is specified, `\texttt{assoc}' and `\texttt{fdr}' methods return a corresponding vector instead of a matrix.
+The association mapping results below indicate that
+there are 478 SNPs associated with both BPD and SCZ
+under the global FDR control at 0.20 level.
+<<GPA-assoc-pattern-ann>>=
+assoc11.GPA.wAnn <- assoc( fit.GPA.wAnn, FDR=0.20, fdrControl="global", pattern="11" )
+length(assoc11.GPA.wAnn)
+head(assoc11.GPA.wAnn)
+table(assoc11.GPA.wAnn)
+fdr11.GPA.wAnn <- fdr( fit.GPA.wAnn, pattern="11" )
+length(fdr11.GPA.wAnn)
+head(fdr11.GPA.wAnn)
+@
+
+\section{Hypothesis Testing for Pleiotropy and Annotation Enrichment}\label{testing}
+
+In the joint analysis of multiple GWAS data,
+it is of interest to investigate whether there is pleiotropy,
+i.e., the signals from the two GWAS are related.
+We developed a hypothesis testing procedure to investigate pleiotropy
+and implemented it as `\texttt{pTest}' method.
+Because this hypothesis testing procedure is based on the likelihood ratio test (LRT),
+we also need a GPA model fit under the null hypothesis of pleiotropy,
+i.e., the signals from the two GWAS are independent of each other.
+Users can easily fit the GPA model under the null hypothesis of pleiotropy
+by setting `\texttt{pleiotropyH0=TRUE}' when running `\texttt{GPA}' method:
+<<GPA-pleiotropy-null-show,eval=FALSE>>=
+fit.GPA.pleiotropy.H0 <- GPA( exampleData$pval[ , c(3,5) ], NULL, pleiotropyH0=TRUE )
+@
+<<GPA-pleiotropy-null-run,echo=FALSE,results=hide>>=
+fit.GPA.pleiotropy.H0 <- GPA( exampleData$pval[ , c(3,5) ], NULL, pleiotropyH0=TRUE, maxIter=100 )
+@
+<<GPA-pleiotropy-null-show>>=
+fit.GPA.pleiotropy.H0
+@
+Now, based on these GPA model, we can implement the hypothesis testing for pleiotropy with the command:
+<<pTest,results=verbatim>>=
+test.GPA.pleiotropy <- pTest( fit.GPA.noAnn, fit.GPA.pleiotropy.H0 )
+@
+The hypothesis testing results indicate that there is strong evidence for pleiotropy between BPD and SCZ.
+
+When annotation data is also available, we can further investigate
+whether there is statistical evidence for enrichment of GWAS signals in this annotation data.
+Again, this hypothesis testing procedure is based on LRT
+and we need to fit a GPA model under the null hypothesis of annotation enrichment,
+i.e., GWAS signals are not enriched in the annotation data.
+This null model can easily be obtained by fitting the GPA model without annotation data,
+which corresponds to the `\texttt{fit.GPA.noAnn}' object we already obtained above.
+Now, we can implement the hypothesis testing for annotation enrichment using `\texttt{aTest}' method:
+<<aTest,results=verbatim>>=
+test.GPA.annotation <- aTest( fit.GPA.noAnn, fit.GPA.wAnn )
+@
+The hypothesis testing results indicate that there is strong evidence 
+for enrichment of GWAS signals in our CNS gene annotation data.
+Currently, `\texttt{aTest}' method works only for one annotataion data
+but we are now working on relaxing this limitation.
+
+\section{Advanced Use}\label{advanced}
+
+Methods `\texttt{print}' and `\texttt{cov}' might be useful for more advanced users.
+`\texttt{print}' method provides the matrix of posterior probability 
+that a SNP belongs to each combination of association status and
+this method will be useful when users want to scrutinize the joint analysis results more closely.
+`\texttt{cov}' method provides the covariance matrix of GPA model
+and this can be useful, for example, in the case that users want to calculate 
+the standard error for certain transformation of parameter estimates using Delta method. 
+
+<<GPA-noann-fdr-cov,results=verbatim>>=
+dim(print(fit.GPA.wAnn))
+head(print(fit.GPA.wAnn))
+cov(fit.GPA.wAnn)
+@
+
+%\section{Conclusion and Ongoing Work}\label{conclusion}
+
+%R package \texttt{mosaics} provides effective tools to read and investigate ChIP-seq data, fit MOSAiCS model, and identify peaks. We are continuously working on improving \texttt{mosaics} package further, especially in supporting more diverse genomes, automating fitting procedures, developing more friendly and easy-to-use user interface, and providing more effective data investigation tools. Please post any questions or requests regarding `\texttt{mosaics}' package at \url{http://groups.google.com/group/mosaics_user_group}. Updates and changes of `\texttt{mosaics}' package will be announced at our Google group and the companion website (\url{http://www.stat.wisc.edu/~keles/Software/mosaics/}).
+
+%\section*{Acknowledgements}
+
+%We thank Gasch, Svaren, Chang, Kiley, Bresnick, Pike, and Donohue Labs at the University of Wisconsin-Madison for sharing their data for MOSAiCS analysis and useful discussions. We also thank Colin Dewey and Bo Li for the CSEM output in Appendix A.7. 
+
+\begin{thebibliography}{99}
+\bibitem{GPA} Chung D*, Yang C*, Li C, Gelernter J, and Zhao H (2013), 
+``GPA: A statistical approach to prioritizing GWAS results
+by integrating pleiotropy information and annotation data.''
+To appear in \textit{PLoS Genetics}. (* Joint first authors)
+\bibitem{PGC1} Cross-Disorder Group of the Psychiatric Genomics Consortium (2013),
+``Genetic relationship between five psychiatric disorders estimated from genome-wide SNPs.''
+\textit{Nature Genetics}, 45: 984-994.
+\bibitem{PGC2} Cross-Disorder Group of the Psychiatric Genomics Consortium (2013),
+``Identification of risk loci with shared effects on five major psychiatric disorders: a genome-wide analysis.''
+\textit{Lancet}, 381: 1371-1379.
+\bibitem{ann1} Lee SH, DeCandia TR, Ripke S, Yang J, Sullivan PF, et al. (2012), 
+``Estimating the proportion of variation in susceptibility to schizophrenia captured by common SNPs.''
+\textit{Nature Genetics}, 44: 247-250.
+\bibitem{ann2} Raychaudhuri S, Korn JM, McCarroll SA, Altshuler D, Sklar P, et al. (2010), 
+``Accurately assessing the risk of schizophrenia conferred by rare copy-number variation 
+affecting genes with brain function.''
+\textit{PLoS Genetics}, 6: e1001097.
+\end{thebibliography}
+
+\end{document}

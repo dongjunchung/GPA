@@ -30,9 +30,10 @@ Returns a list with components:
     \item{pvalue}{ p-value of the pleiotropy test. }
 }
 \references{
-Chung D, Yang C, Li C, Gelernter J, and Zhao H (2014), 
+Chung D*, Yang C*, Li C, Gelernter J, and Zhao H (2014), 
 "GPA: A statistical approach to prioritizing GWAS results 
 by integrating pleiotropy information and annotation data."
+To appear in PLoS Genetics. (*: Joint first authors)
 }
 \author{ Dongjun Chung }
 \seealso{

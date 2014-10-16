@@ -4,4 +4,4 @@ import( methods, graphics, Rcpp )
 
 export( GPA, assoc, aTest, pTest )
 
-export( show, print, fdr, cov, estimates )
+export( show, print, fdr, cov, estimates, se )

@@ -1,4 +1,20 @@
-      
+    
+Changes in version 0.9.3:
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o Incorporate R package vignette.
+   
+   o assoc(), fdr(): allows association mapping & local FDR for specific association status.
+   
+   o aTest(), pTest(): message() was replaced with cat().
+   
+Changes in version 0.9.2:
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o Add se() to provide parameter estimates and their standard errors.
+   
 Changes in version 0.9.1:
 
 SIGNIFICANT USER-VISIBLE CHANGES

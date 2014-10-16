@@ -51,15 +51,15 @@ pTest <- function( fit, fitH0, vDigit=1000 ) {
 	
 	# summary	
     
-	message( "Hypothesis testing for pleiotropy" )
-	message( "--------------------------------------------------" )
-	message( "GWAS combination: ", paste( combVec, collapse=" " ) )
-    message( "pi: ", paste( round(pis*vDigit)/vDigit, collapse=" " ) )
-    message( "  ( ", paste( round(piSE*vDigit)/vDigit, collapse=" " ), " )" )
-	message( " " )
-    message( "test statistics: ", paste( round(LRT*vDigit)/vDigit, collapse=" " ) )
-    message( "p-value: ", pvalue, collapse=" " )
-	message( "--------------------------------------------------" )
+	cat( "Hypothesis testing for pleiotropy\n" )
+	cat( "--------------------------------------------------\n" )
+	cat( "GWAS combination: ", paste( combVec, collapse=" " ), "\n" )
+    cat( "pi: ", paste( round(pis*vDigit)/vDigit, collapse=" " ), "\n" )
+    cat( "  ( ", paste( round(piSE*vDigit)/vDigit, collapse=" " ), " )\n" )
+	cat( "\n" )
+    cat( "test statistics: ", paste( round(LRT*vDigit)/vDigit, collapse=" " ), "\n" )
+    cat( "p-value: ", pvalue, "\n", collapse=" " )
+	cat( "--------------------------------------------------\n" )
 	
 	return( list( pi=pis, piSE=piSE, statistics=LRT, pvalue=pvalue ) )
 }

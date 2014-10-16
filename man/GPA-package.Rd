@@ -13,8 +13,8 @@ by integrating pleiotropy information and annotation data.
 \tabular{ll}{
 Package: \tab GPA\cr
 Type: \tab Package\cr
-Version: \tab 0.9.1\cr
-Date: \tab 2014-01-31\cr
+Version: \tab 0.9.3\cr
+Date: \tab 2014-10-31\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 }
@@ -29,12 +29,13 @@ for pleiotropy and annotation enrichment, respectively.
 \author{
 Dongjun Chung
 
-Maintainer: Dongjun Chung <dongjun.chung@yale.edu>
+Maintainer: Dongjun Chung <chungd@musc.edu>
 }
 \references{
-Chung D, Yang C, Li C, Gelernter J, and Zhao H (2014), 
+Chung D*, Yang C*, Li C, Gelernter J, and Zhao H (2014), 
 "GPA: A statistical approach to prioritizing GWAS results 
 by integrating pleiotropy information and annotation data."
+To appear in PLoS Genetics. (*: Joint first authors)
 }
 \keyword{ package }
 \seealso{

@@ -16,6 +16,11 @@ setGeneric( "cov",
     standardGeneric("cov")
 )
 
+setGeneric( "se",
+    function( object, ... )
+    standardGeneric("se")
+)
+
 setGeneric( "estimates",
     function( object, ... )
     standardGeneric("estimates")

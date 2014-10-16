@@ -111,27 +111,27 @@ aTest <- function( fitWithoutAnn, fitWithAnn, vDigit=1000 ) {
 	
 	# summary	
     
-	message( "Hypothesis testing for annotation enrichment" )
-	message( "( Note: This version of test is designed for single annotation data )" )
-	message( "--------------------------------------------------" )
+	cat( "Hypothesis testing for annotation enrichment\n" )
+	cat( "( Note: This version of test is designed for single annotation data )\n" )
+	cat( "--------------------------------------------------\n" )
 	
-	message( "q:" )
-	message( "GWAS combination: ", paste( combVec, collapse=" " ) )
+	cat( "q:\n" )
+	cat( "GWAS combination: ", paste( combVec, collapse=" " ), "\n" )
 	for ( d in 1:nAnn ) {    	
-		message( "Annotation #",d,":")
-    	message( "    ", paste( round(fitWithAnn@fit$q1[d,]*vDigit)/vDigit, collapse=" " ) )
+		cat( "Annotation #",d,":\n")
+    	cat( "    ", paste( round(fitWithAnn@fit$q1[d,]*vDigit)/vDigit, collapse=" " ), "\n" )
     	
     	if ( empiricalNull ) {
     		locQ1 <- (nPis-1+2*nAlpha+nPis*(d-1)+1):(nPis-1+2*nAlpha+nPis*d)
 		} else {
 			locQ1 <- (nPis-1+nAlpha+nPis*(d-1)+1):(nPis-1+nAlpha+nPis*d)
 		}
-    	message( "  ( ", paste( round(seVec[locQ1]*vDigit)/vDigit, collapse=" " ), " )" )
+    	cat( "  ( ", paste( round(seVec[locQ1]*vDigit)/vDigit, collapse=" " ), " )\n" )
 	}
 	
-	message( " " )
-	message( "Ratio of q over baseline (",combVec[1],"):" )
-	message( "GWAS combination: ", paste( combVec[-1], collapse=" " ) )
+	cat( "\n" )
+	cat( "Ratio of q over baseline (",combVec[1],"):\n" )
+	cat( "GWAS combination: ", paste( combVec[-1], collapse=" " ), "\n" )
 	q1ratio <- q1ratioSE <- matrix( NA, nrow(fitWithAnn@fit$q1), (ncol(fitWithAnn@fit$q1)-1) )
 	for ( d in 1:nAnn ) {
 		# estimates
@@ -150,14 +150,14 @@ aTest <- function( fitWithoutAnn, fitWithAnn, vDigit=1000 ) {
 		}			
 	}	
 	for ( d in 1:nAnn ) {   
-		message( "Annotation #",d,":") 	
-		message( "    ", paste( round(q1ratio[d,]*vDigit)/vDigit, collapse=" " ) )
-		message( "  ( ", paste( round(q1ratioSE[d,]*vDigit)/vDigit, collapse=" " ), " )" )
+		cat( "Annotation #",d,":\n") 	
+		cat( "    ", paste( round(q1ratio[d,]*vDigit)/vDigit, collapse=" " ), "\n" )
+		cat( "  ( ", paste( round(q1ratioSE[d,]*vDigit)/vDigit, collapse=" " ), " )\n" )
 	}
-	message( " " )
-    message( "test statistics: ", paste( round(LRT*vDigit)/vDigit, collapse=" " ) )
-    message( "p-value: ", pvalue, collapse=" " )
-	message( "--------------------------------------------------" )
+	cat( "\n" )
+    cat( "test statistics: ", paste( round(LRT*vDigit)/vDigit, collapse=" " ), "\n" )
+    cat( "p-value: ", pvalue, "\n", collapse=" " )
+	cat( "--------------------------------------------------\n" )
 	
 	return( list( q=fitWithAnn@fit$q1, statistics=LRT, pvalue=pvalue ) )
 }

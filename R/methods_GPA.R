@@ -146,13 +146,37 @@ setMethod(
 setMethod(
     f="fdr",
     signature="GPA",
-    definition=function( object ) {
-        # return marginal local FDR
+    definition=function( object, pattern=NULL ) {
+      if ( is.null(pattern) ) {
+        # if pattern is not specified, return marginal local FDR
 		
 		margfdr <- 1 - object@fit$Zmarg
 		colnames(margfdr) <- colnames(object@gwasPval)
 		
 		return(margfdr)
+      } else {
+        # if pattern is provided, return FDR matching the pattern
+        
+        ppmat <- print(object)
+        
+        # parse pattern & convert it to regular expression
+        
+        ptvec <- strsplit( pattern, "" )[[1]]  
+        if ( length(grep( "(1|\\*)", ptvec )) < length(ptvec) ) {
+          stop( "Invalid 'pattern' argument! Please use only '1' or '*' for the pattern." )
+        }
+        ptreg <- paste( gsub( "\\*", "(0|1)", ptvec ), collapse="" )
+        locp <- grep( ptreg, colnames(ppmat) )
+        
+        # return related FDR
+        
+        if ( length(locp) > 0 ) {
+          psel <- 1 - rowSums(ppmat[ , locp, drop=FALSE ])
+          return(psel)
+        } else {
+          stop( "Invalid 'pattern' argument! Please provide correct pattern." )
+        }
+      }
     }
 )
 
@@ -163,6 +187,112 @@ setMethod(
         # calculate covariance matrix using empirical information matrix
 		
 		.covGPA( object, silent=silent, vDigitEst=vDigitEst, vDigitSE=vDigitSE )
+    }
+)
+
+setMethod(
+    f="se",
+    signature="GPA",
+    definition=function( object, ... ) {
+        # return estimates & standard error
+		
+		# covariance matrix
+		
+		covEst <- .covGPA( object, silent=TRUE, vDigitEst=1000, vDigitSE=1000 )			
+		seVec <- list()
+	
+		# extract estimates
+		
+		empiricalNull <- object@setting$empiricalNull
+		useAnn <- object@setting$useAnn
+		
+		pis <- object@fit$pis
+		betaAlpha <- object@fit$betaAlpha
+		if ( empiricalNull ) {
+			betaAlphaNull <- object@fit$betaAlphaNull
+		}
+		
+		nGWAS <- length(betaAlpha)
+		
+		if ( useAnn ) {
+			q1 <- object@fit$q1
+			nAnn <- nrow(q1)
+		}
+		
+		# extract information from estimates
+					
+		binaryList <- vector( "list", nGWAS )
+		for ( k in 1:nGWAS ) {
+			binaryList[[k]] <- c( 0, 1 )
+		}
+		binaryMat <- expand.grid( binaryList )
+		
+		nComp <- nrow(binaryMat)
+		combVec <- apply( binaryMat, 1, function(bm) paste( bm, collapse="" ) )
+		
+		nPis <- length(pis)
+		nAlpha <- length(betaAlpha)
+		
+		if ( useAnn ) {
+			nQ1 <- nAnn * nComp
+		}
+		
+		# SE for pi, using Delta method
+		
+		piSE <- sqrt(diag(covEst))[ 1:(nPis-1) ]			
+		gderiv <- as.matrix( c( rep( -1, (nPis-1) ), 
+			rep( 0, nrow(covEst) - (nPis-1) ) ) )
+		pi00SE <- sqrt( t(gderiv) %*% covEst %*% gderiv )
+		
+		piSE <- c( pi00SE, piSE )
+		names(piSE)[1] <- paste("pi_",names(pis)[1],sep="")
+		
+		# return estimates and SE	
+		
+		locPi <- 1:(nPis-1)
+		locAlpha <- (nPis-1+1):(nPis-1+nAlpha)		
+		
+		seVec$betaAlpha <- sqrt(diag(covEst))[locAlpha]
+		
+		if ( empiricalNull ) {
+			locAlpha0 <- (nPis-1+nAlpha+1):(nPis-1+nAlpha+nAlpha)			
+			seVec$betaAlphaNull <- sqrt(diag(covEst))[locAlpha0]
+		}
+		
+		seVec$pis <- piSE
+		
+		if ( useAnn ) {    
+			# q
+			
+			seVec$q1 <- c()			
+			for ( d in 1:nAnn ) {
+				if ( empiricalNull ) {
+					locQ1 <- (nPis-1+2*nAlpha+nPis*(d-1)+1):(nPis-1+2*nAlpha+nPis*d)
+				} else {
+					locQ1 <- (nPis-1+nAlpha+nPis*(d-1)+1):(nPis-1+nAlpha+nPis*d)
+				}
+				
+				seVec$q1 <- rbind( seVec$q1, sqrt(diag(covEst))[locQ1] )
+			}
+			
+			# ratio of q
+			
+			q1ratioSE <- matrix( NA, nrow(q1), (ncol(q1)-1) )
+			for ( d in 1:nAnn ) {				
+				for ( j in 2:ncol(q1) ) {
+					qderiv <- rep( 0, nrow(q1)*ncol(q1) )
+					qderiv[ ncol(q1) * (d-1) + 1 ] <- - q1[d,j] / q1[d,1]^2
+					qderiv[ ncol(q1) * (d-1) + j ] <- 1 / q1[d,1]
+					
+					gderiv <- as.matrix( c( rep( 0, nrow(covEst) - nrow(q1)*ncol(q1) ), qderiv ) )
+					q1ratioSE[d,(j-1)] <- sqrt( t(gderiv) %*% covEst %*% gderiv )
+				}			
+			}			
+			
+			seVec$q1ratio <- q1ratioSE
+		}		
+		
+		return( seVec )
     }
 )
 
@@ -181,6 +311,13 @@ setMethod(
 		}
 		if ( object@setting$useAnn ) { 
 			paramEst$q1 <- object@fit$q1
+			
+			# ratio of q
+			
+			paramEst$q1ratio <- matrix( NA, nrow(paramEst$q1), (ncol(paramEst$q1)-1) )
+			for ( d in 1:nrow(paramEst$q1) ) {			
+				paramEst$q1ratio[d,] <- paramEst$q1[d,-1] / paramEst$q1[d,1]
+			}	
 		}
 		
 		return(paramEst)
