@@ -11,7 +11,7 @@ Windows binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3
 
 Mac OS/X binary: https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.tgz?raw=true
 
-GPA vignette provides a good start point for the step-by-step data analysis using GPA package and it can be found at Package source: https://github.com/dongjunchung/GPA_binary/blob/master/inst/doc/GPA-example.pdf?raw=true. Please check https://groups.google.com/d/forum/gpa-user-group for discussions and questions regarding genetic data analysis using GPA package. You can track development of GPA package at http://github.com/dongjunchung/GPA.
+GPA vignette provides a good start point for the step-by-step data analysis using GPA package and it can be found at Package source: https://github.com/dongjunchung/GPA/blob/master/inst/doc/GPA-example.pdf?raw=true. Please check https://groups.google.com/d/forum/gpa-user-group for discussions and questions regarding genetic data analysis using GPA package. You can track development of GPA package at http://github.com/dongjunchung/GPA.
 
 Usage
 ===========
