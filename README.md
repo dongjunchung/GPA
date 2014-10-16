@@ -38,4 +38,4 @@ install_github("dongjunchung/GPA")
 References
 ==========
 
-Chung D\*, Yang C\*, Li C, Gelernter J, and Zhao H (2014), "GPA: A statistical approach to prioritizing GWAS results by integrating pleiotropy information and annotation data." (\* joint first authors; submitted)
+Chung D\*, Yang C\*, Li C, Gelernter J, and Zhao H (2014), "GPA: A statistical approach to prioritizing GWAS results by integrating pleiotropy information and annotation data." To appear in PLoS Genetics. (\* joint first authors)
