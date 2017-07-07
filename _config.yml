@@ -2,7 +2,7 @@ title: GPA
 description: "GPA: Genetic analysis incorporating Pleiotropy and Annotation"
 google_analytics: UA-47265526-1
 show_downloads: true
-theme: jekyll-theme-cayman
+theme: jekyll-theme-slate
 
 gems:
   - jekyll-mentions
