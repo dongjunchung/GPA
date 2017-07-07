@@ -39,6 +39,6 @@ install_github("dongjunchung/GPA")
 References
 ==========
 
-Chung D\*, Yang C\*, Li C, Gelernter J, and Zhao H (2014), "GPA: A statistical approach to prioritizing GWAS results by integrating pleiotropy information and annotation data." PLoS Genetics, 10: e1004787. (\* joint first authors)
+Chung D\*, Yang C\*, Li C, Gelernter J, and Zhao H (2014), "GPA: A statistical approach to prioritizing GWAS results by integrating pleiotropy information and annotation data," *PLoS Genetics*, 10: e1004787. (\* joint first authors)
 
 Kortemeier E, Ramos PS, Hunt KJ, Kim HJ, Hardiman G, and Chung D (2017), "ShinyGPA: An interactive and dynamic visualization toolkit for genetic studies."
