@@ -1,4 +1,14 @@
-    
+
+Changes in version 1.1.0:    
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o Incorporate ShinyGPA developed by Emma Kortemeier as a part of the R package.
+
+   o Add fitAll() to fit GPA models for possible pairs of phenotypes.
+
+   o Add shinyGPA() to open the shiny app for the interactive pleiotropy visualization.
+
 Changes in version 0.9.3:
 
 SIGNIFICANT USER-VISIBLE CHANGES

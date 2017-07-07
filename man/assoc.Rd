@@ -43,8 +43,8 @@ Otherwise, returns a binary vector indicating association of SNPs for the phenot
 \references{
 Chung D*, Yang C*, Li C, Gelernter J, and Zhao H (2014), 
 "GPA: A statistical approach to prioritizing GWAS results 
-by integrating pleiotropy information and annotation data."
-To appear in PLoS Genetics. (*: Joint first authors)
+by integrating pleiotropy information and annotation data,"
+PLoS Genetics, 10: e1004787. (* joint first authors)
 
 Newton MA, Noueiry A, Sarkar D, and Ahlquist P (2004),
 "Detecting differential gene expression with a semiparametric hierarchical mixture method,"

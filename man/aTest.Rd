@@ -31,8 +31,8 @@ Returns a list with components:
 \references{
 Chung D*, Yang C*, Li C, Gelernter J, and Zhao H (2014), 
 "GPA: A statistical approach to prioritizing GWAS results 
-by integrating pleiotropy information and annotation data."
-To appear in PLoS Genetics. (*: Joint first authors)
+by integrating pleiotropy information and annotation data,"
+PLoS Genetics, 10: e1004787. (* joint first authors)
 }
 \author{ Dongjun Chung }
 \seealso{
