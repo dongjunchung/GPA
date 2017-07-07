@@ -24,11 +24,11 @@ Installation
 
 The stable versions of 'GPA' package can be obtained from the following URLs:
 
-Package source: [https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.tar.gz?raw=true](https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.tar.gz?raw=true)
+Package source: [https://github.com/dongjunchung/GPA_binary/blob/master/GPA_1.1-0.tar.gz?raw=true](https://github.com/dongjunchung/GPA_binary/blob/master/GPA_1.1-0.tar.gz?raw=true)
 
-Windows binary: [https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.zip?raw=true](https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.zip?raw=true)
+Windows binary: [https://github.com/dongjunchung/GPA_binary/blob/master/GPA_1.1-0.zip?raw=true](https://github.com/dongjunchung/GPA_binary/blob/master/GPA_1.1-0.zip?raw=true)
 
-Mac OS/X binary: [https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.tgz?raw=true](https://github.com/dongjunchung/GPA_binary/blob/master/GPA_0.9-3.tgz?raw=true)
+Mac OS/X binary: [https://github.com/dongjunchung/GPA_binary/blob/master/GPA_1.1-0.tgz?raw=true](https://github.com/dongjunchung/GPA_binary/blob/master/GPA_1.1-0.tgz?raw=true)
 
 To install the developmental versions of 'GPA' package, it's easiest to use the 'devtools' package. Note that the 'GPA' package depends on the 'Rcpp' package, which also requires appropriate setting of *Rtools* and *Xcode* for Windows and Mac OS/X, respectively.
 
