@@ -20,7 +20,7 @@ library(GPA)
 ```
 
 Installation
-============
+============ 
 
 The stable versions of 'GPA' package can be obtained from the following URLs:
 
