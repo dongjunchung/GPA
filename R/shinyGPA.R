@@ -127,7 +127,7 @@ shinyGPA <- function(out=NULL){
                                   selected = 1)),
                    
                    numericInput(inputId = "fdr", 
-                                label="Set false discovery rate (FDR)",
+                                label="Set Global False Discovery Rate (FDR)",
                                 value= 0.1,
                                 min=0, max=1,
                                 step = 0.01,
