@@ -131,7 +131,7 @@ shinyGPA <- function(out=NULL){
                                 value= 0.1,
                                 min=0, max=1,
                                 step = 0.01,
-                                width= "20%"),
+                                width= "40%"),
                    
                    downloadButton("downloadTable", label = "Download SNP Table")
                    
