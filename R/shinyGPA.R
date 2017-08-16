@@ -131,8 +131,9 @@ shinyGPA <- function(out=NULL){
                                 value= 0.1,
                                 min=0, max=1,
                                 step = 0.01,
-                                width= "20%")
+                                width= "20%"),
                    
+                   downloadButton("downloadTable", label = "Download SNP Table")
                    
                  ),
                  tableOutput(outputId = "table")
@@ -397,8 +398,9 @@ shinyGPA <- function(out=NULL){
     #table for the info tab
     
      tableInput <- function(){
-        pid <- sort(c(input$checklist1, input$checklist2)) 
-        fit <-which(out$combs[,1] == which( colnames(smat) == pid[1] ) & out$combs[,2] == which( colnames(smat) == pid[2]) )
+        pid <- c(input$checklist1, input$checklist2)
+        pid.num <- sort( c( which( colnames(smat) == pid[1] ), which( colnames(smat) == pid[2]) ) )
+        fit <-which(out$combs[,1] == pid.num[1] & out$combs[,2] == pid.num[2] )
         tableInfo <- assoc(out$fitGPA[[fit]], FDR=input$fdr, pattern="11")
         
         if (!is.null(rownames(pmat))) {
@@ -418,6 +420,22 @@ shinyGPA <- function(out=NULL){
      output$table <- renderTable({
        print(tableInput())
      })
+     
+     
+     
+     # downloading SNP table
+    
+     output$downloadTable <- downloadHandler(
+       filename = function() {
+         if( input$title != "" ) {
+           paste(input$title, '-ShinySNPtable','.csv', sep='')
+         } else {
+           'data-ShinySNPtable.csv'
+         }
+       },
+       content = function(file) {
+         write.csv(tableInput(), file)
+       })
     
   }
   
