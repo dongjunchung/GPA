@@ -141,10 +141,10 @@ GPA <- function( gwasPval, annMat=NULL, pleiotropyH0=FALSE, empiricalNull=FALSE,
 			message( "Info: Some SNPs have p-values close to zero." )
 			message( "Info: Number of SNPs with p-values close to zero: ", length(which( gwasPval < lbPval )) )
 			message( "Info: p-values for these SNPs are set to ", lbPval )
-			
-			gwasPval[ gwasPval < lbPval ] <- lbPval
 		}
 	}
+	
+	gwasPval[ gwasPval < lbPval ] <- lbPval
 	
 	# define binary matrix for multiple GWAS datas
 	
