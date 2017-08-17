@@ -8,6 +8,8 @@ SIGNIFICANT USER-VISIBLE CHANGES
    o Add fitAll() to fit GPA models for possible pairs of phenotypes.
 
    o Add shinyGPA() to open the shiny app for the interactive pleiotropy visualization.
+   
+   o Fix a bug in GPA(), which resulted in NaN when verbose == 0.
 
 Changes in version 0.9.3:
 
